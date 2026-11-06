@@ -61,22 +61,12 @@ burst, so PSNR penalises a sharper result. This is a dataset limitation, not a m
   with a robust median-based estimate).
 - The traditional ISP baseline: Malvar demosaic, bilateral/NLM denoise sized by measured noise, noise-adaptive
   edge-masked sharpening.
+- Also Helped in developing report.
 
 **Numbers to quote**
 - Metadata WB vs gray-world: +5.8 dB. Colour matrix on vs off: +2.2 dB.
 - Estimated noise model is only 0.16 dB worse than the DNG profile.
 
-**Likely viva questions**
-1. *Why keep WB/CCM classical?* They're fully determined by calibration metadata every DNG carries. Learning them
-   costs capacity and fails on new sensors (end-to-end ΔE 6.77 vs 2.44).
-2. *What is demosaicing?* Each sensor pixel sees one colour (RGGB pattern). Demosaicing interpolates the other two.
-   Malvar-He-Cutler uses gradient correction to avoid colour fringes.
-3. *Why denoise after tone mapping in the traditional ISP?* Bilateral/NLM parameters are tuned for display-referred
-   images. We measure σ on the output and size the filter to it.
-4. *Why does sharpening use an edge mask?* Unsharp masking amplifies noise. We only boost detail above 2.5σ and
-   weaken it as noise rises.
-5. *How do you handle a phone with a different Bayer layout?* Find the (dy, dx) shift that makes the 2×2 pattern
-   RGGB and crop by it.
 
 **Failure case I present:** F4. Without AsShotNeutral, gray-world white balance tints scenes dominated by one
 colour, costing about 6 dB in our ablation.
