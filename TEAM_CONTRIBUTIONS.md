@@ -31,16 +31,7 @@ Everyone reviewed the final results together and can explain the overall archite
 - Hybrid 34.91 dB / ΔE 2.44 vs traditional 28.03 / 5.83 vs end-to-end 29.43 / 6.77.
 - ISO ≥ 3200: hybrid 30.55 vs traditional 22.14. At 16× underexposure: 27.06 vs 19.45.
 
-**Likely viva questions**
-1. *Why split by scene, not randomly?* SIDD photographs the same 10 scenes many times. A random split puts the
-   same objects in train and test and inflates scores.
-2. *How was ground truth made?* Mean of 150 frames shot on a tripod (not aligned), which divides the noise std by ~12, then the
-   same classical renderer for every method, so the comparison is fair.
-3. *Why ΔE2000 and LPIPS on top of PSNR?* PSNR misses colour shifts and perceptual blur. ΔE measures colour error
-   the way humans see it; LPIPS measures perceptual similarity.
-4. *Why crops with a margin?* Networks run in tiles. Evaluating on a crop's interior avoids penalising edge effects.
-5. *Is the test data unseen?* Yes: different physical scenes, and its noisy frames were never used in training or
-   model selection (selection used the val scene).
+
 
 **Failure case I present:** F2. The ground truth is blurrier than our output because of camera shake during the
 burst, so PSNR penalises a sharper result. This is a dataset limitation, not a model bug.
@@ -125,28 +116,10 @@ gain), and the burst ground truth contains an object that moved, so part of the 
 - FP16 on GPU: 25.7 → 14.0 ms per MP, no quality loss.
 - Student network: 365 ms per MP (FP32) / 527 ms (W8A16) on 2 CPU threads, about 170 MB peak memory. Whole deployed pipeline: 0.64 s per MP.
 
-**Likely viva questions**
-1. *Why did 8-bit activations fail?* Linear RAW is dark: shadows use ~1% of the range. One 8-bit scale per
-   tensor leaves them a handful of levels, causing posterisation and colour shift. 16-bit activations fix it.
-2. *Why is W8A16 slower than FP32 on CPU?* ONNX Runtime on x86 has no fast 16-bit integer kernels. The win is size
-   and mobile-NPU compatibility (NPUs support 16-bit activations natively).
-3. *Why ONNX Runtime and not PyTorch in the app?* Smaller image (no PyTorch), faster start, and the same file runs
-   on mobile runtimes.
-4. *How does the app stay under 10 seconds?* Student model, 4 MP centre crop by default, tiled batching, and the
-   classical stages vectorised with lookup tables.
-5. *How do I run it?* `make app`, or `docker build -t hybrid-isp . && docker run -p 7860:7860 hybrid-isp`.
+
 
 **Failure case I present:** F5. An unsupported RAW variant (a Galaxy S22 DNG): the app shows a clear error instead of
 crashing. Also the W8A8 quantisation failure, as an optimisation lesson.
 
 ---
 
-## 3-minute demo script
-
-| Time | Who | What |
-|---|---|---|
-| 0:00–0:30 | Hitesh S | Problem + architecture diagram: classical stages where metadata decides, network where content decides. |
-| 0:30–1:15 | Gurupreeth H | Live URL: upload the judge's (or an unseen phone's) DNG → walk the stage gallery: RAW → WB → noise map → network → CCM/tone. |
-| 1:15–2:00 | Hemansshu Raaj RK | "Compare all" on the ISO 10,000 example: traditional vs end-to-end vs hybrid, metrics against ground truth; results table and sweep plot. |
-| 2:00–2:35 | Jithesh D | Model choices and ablations: hybrid +5.5 dB over end-to-end, noise-map steering, distillation result. |
-| 2:35–3:00 | Hitesh S | 0.71 MB W8A16 model, latency numbers, one failure case (F2: GT blurrier than our output). |
