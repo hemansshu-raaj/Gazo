@@ -3,6 +3,7 @@
 Run:  python app.py   (http://localhost:7860)
 """
 import glob
+import hashlib
 import json
 import os
 import time
@@ -51,8 +52,25 @@ def _center_crop(raw, max_pixels):
     return raw, True
 
 
+def _sha1(path):
+    h = hashlib.sha1()
+    with open(path, "rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _is_builtin_example(path):
+    """True only for the website's bundled example files (matched by content, so renaming an upload
+    does not count). Evaluation metrics are shown for these and nothing else."""
+    try:
+        return os.path.getsize(path) in _EXAMPLE_SIZES and _sha1(path) in _EXAMPLE_HASHES
+    except OSError:
+        return False
+
+
 def _load_gt(path, raw):
-    if not path.endswith(".npz"):
+    if not path.endswith(".npz") or not _is_builtin_example(path):
         return None
     z = np.load(path, allow_pickle=False)
     if "gt" not in z:
@@ -129,24 +147,29 @@ def process(file, mode, model_name, auto_exposure, sharpen, full_res, progress=g
     if gt is not None:
         compare.append((_to_u8(gt, o, 1600), "Ground truth (150-frame average)"))
     gallery = [(fix_orientation(v, o), k) for k, v in stages.items()]
-    rows = []
-    for k, v in results.items():
-        m = _metrics(v, gt)
-        ms = sum(info[k]["timings_ms"].values())
-        rows.append(f"| {k} | " + (" | ".join(str(x) for x in m.values()) if m else "– | – | –") + f" | {ms:,.0f} |")
-    table = "| Pipeline | PSNR (dB) ↑ | SSIM ↑ | ΔE2000 ↓ | Time (ms) |\n|---|---|---|---|---|\n" + "\n".join(rows)
+    times = {k: sum(info[k]["timings_ms"].values()) for k in results}
+    if gt is not None:  # built-in example with ground truth: full evaluation table
+        rows = [f"| {k} | " + " | ".join(str(x) for x in _metrics(v, gt).values()) + f" | {times[k]:,.0f} |"
+                for k, v in results.items()]
+        table = ("**Evaluation against ground truth (150-frame average)**\n\n"
+                 "| Pipeline | PSNR (dB) ↑ | SSIM ↑ | ΔE2000 ↓ | Time (ms) |\n|---|---|---|---|---|\n" + "\n".join(rows))
+    else:  # uploads (and examples without ground truth): processing time only, no metrics table
+        table = "**Processing time:** " + " · ".join(f"{k} {t / 1000:.1f} s" for k, t in times.items())
     h, w = raw.shape
     notes = [f"**Input:** {os.path.basename(path)} · {w}×{h} px RAW"
              + (f" (centre {raw.shape[0] * raw.shape[1] / 1e6:.0f} MP crop for speed; tick *Full resolution* for the whole image)" if cropped else ""),
              f"**Total time:** {time.perf_counter() - t_start:.1f} s"]
     if gt is None:
-        notes.append("No ground truth for this input, so only timings are shown.")
+        notes.append("Quality metrics need a ground-truth reference, so they are shown only for the built-in "
+                      "SIDD examples below.")
     details = {k: {kk: vv for kk, vv in v.items() if kk != "timings_ms"} | {"timings_ms": {kk: round(vv) for kk, vv in
                v["timings_ms"].items()}} for k, v in info.items()}
     return final, compare, gallery, "\n\n".join(notes) + "\n\n" + table, details
 
 
 EXAMPLES = sorted(glob.glob(os.path.join(ROOT, "examples", "*.npz"))) + sorted(glob.glob(os.path.join(ROOT, "examples", "*.dng")))
+_EXAMPLE_HASHES = {_sha1(p) for p in EXAMPLES}
+_EXAMPLE_SIZES = {os.path.getsize(p) for p in EXAMPLES}
 
 with gr.Blocks(title="Hybrid Smartphone ISP") as demo:
     gr.Markdown(
