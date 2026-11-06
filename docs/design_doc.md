@@ -80,12 +80,12 @@ Measurements: parameters, file size, CPU latency (2 and 4 threads), peak memory 
 Test split: 26 captures (scenes 003 + 007), 832 seeded 512×512 crops. Full tables (per ISO, per illumination,
 per phone, degradation sweep): `eval_P2_T77.md`.
 
-| Pipeline | PSNR ↑ | SSIM ↑ | ΔE2000 ↓ | LPIPS ↓ | Params | Size | CPU ms/MP (2 thr) |
+| Pipeline | PSNR ↑ | SSIM ↑ | ΔE2000 ↓ | LPIPS ↓ | Params | Size | Full pipeline, CPU ms/MP (2 thr) |
 |---|---|---|---|---|---|---|---|
-| Traditional ISP | 28.03 | 0.674 | 5.83 | 0.459 | – | – | – |
-| Learned E2E | 29.43 | 0.877 | 6.77 | 0.286 | 2.65 M | 10.8 MB | 2418 |
-| **Hybrid teacher** | **34.91** | **0.895** | **2.44** | **0.236** | 2.65 M | 10.8 MB | 2425 |
-| Hybrid student (W8A16, deployed) | 34.54 | 0.890 | 2.57 | 0.249 | 0.63 M | **0.71 MB** | 784 |
+| Traditional ISP | 28.03 | 0.674 | 5.83 | 0.459 | – | – | 305 |
+| Learned E2E | 29.43 | 0.877 | 6.77 | 0.286 | 2.65 M | 10.8 MB | 2697 |
+| **Hybrid teacher** | **34.91** | **0.895** | **2.44** | **0.236** | 2.65 M | 10.8 MB | 2753 |
+| Hybrid student (W8A16, deployed) | 34.54 | 0.890 | 2.57 | 0.249 | 0.63 M | **0.71 MB** | 637 |
 
 The hybrid wins in every ISO bucket, both illumination levels and all five phones. The deployed student keeps
 99% of the teacher's PSNR at 1/15 of the size.

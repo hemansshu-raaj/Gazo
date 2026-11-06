@@ -44,11 +44,11 @@ removes that burden: the same network capacity goes into denoising and demosaici
 | Knowledge distillation: KD student vs same student trained from scratch | +0.04 dB | −0.03 | **No meaningful gain at this size.** The 0.63 M student is close to the teacher already (−0.37 dB), leaving little for distillation to transfer in 30 k steps. Reported as a negative result. |
 
 ### 1.4 Precision and quantisation (student, 0.63 M params)
-| Variant | Size | PSNR | Δ vs FP32 | CPU ms / MP (2 threads) |
+| Variant | Size | PSNR | Δ vs FP32 | Network-only CPU ms / MP (2 threads) |
 |---|---|---|---|---|
-| FP32 | 2.53 MB | 34.56 | – | 546 |
-| **INT8 weights + 16-bit activations (W8A16)**, deployed | **0.71 MB** | **34.54** | **−0.02** | 784 |
-| Full INT8 (W8A8, all ops) | 0.71 MB | 27.72 | **−6.84** | 305 |
+| FP32 | 2.53 MB | 34.56 | – | 365 |
+| **INT8 weights + 16-bit activations (W8A16)**, deployed | **0.71 MB** | **34.54** | **−0.02** | 527 |
+| Full INT8 (W8A8, all ops) | 0.71 MB | 27.72 | **−6.84** | 216 |
 | Teacher FP16 (GPU) | 5.38 MB | 34.91 | 0.00 vs FP32 | GPU: 14.0 ms vs 25.7 ms FP32 (A10) |
 
 **Why full INT8 fails here:** the network works on linear RAW values, where shadows sit within the bottom ~1% of
@@ -68,7 +68,7 @@ PSNR as the clean RAW is darkened by 2^k and amplified back (`docs/sweep.png`):
 | **Hybrid teacher** | **38.44** | **37.38** | **35.35** | **31.50** | **27.06** |
 | Student (KD) | 37.94 | 36.62 | 34.39 | 30.18 | 24.80 |
 
-The hybrid stays best at every level. The gap to traditional grows from 8 dB to 11 dB as light drops. The E2E
+The hybrid stays best at every level. The gap to traditional is 7.6 to 11.0 dB at every level: largest at 4× (35.35 vs 24.38 dB), narrowing to 7.6 dB at 16× where both run out of signal. The E2E
 model degrades more slowly in relative terms but starts 8 dB lower. The small student falls off fastest beyond
 8× gain, the clearest cost of compression.
 

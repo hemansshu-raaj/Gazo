@@ -1,0 +1,12 @@
+{
+ "input": "1024x1024 RAW (1 MP), examples/sidd_normal_nexus6.npz",
+ "threads": 2,
+ "cpu": "13th Gen Intel(R) Core(TM) i5-13420H",
+ "median_ms": {
+  "Traditional ISP": 305.4,
+  "Learned E2E (FP32)": 2697.4,
+  "Hybrid teacher (FP32)": 2753.0,
+  "Hybrid student (FP32)": 487.0,
+  "Hybrid student (W8A16, deployed)": 637.2
+ }
+}

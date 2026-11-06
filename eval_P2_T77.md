@@ -9,14 +9,14 @@
 | Pipeline | PSNR (dB) ↑ | SSIM ↑ | ΔE2000 ↓ | LPIPS ↓ | Params (M) | Model size (MB) | CPU latency, 1 MP, 2 threads (ms) | Peak CPU memory (MB) | GPU latency, 1 MP, A10 (ms) |
 |---|---|---|---|---|---|---|---|---|---|
 | Traditional ISP | 28.03 | 0.6741 | 5.83 | 0.4594 | 0 (classical) | – | – | – | – |
-| Learned E2E | 29.43 | 0.8765 | 6.77 | 0.2862 | 2.653 | 10.76 | 2418 | 390 | 25.5 |
-| Hybrid teacher FP32 | 34.91 | 0.8945 | 2.44 | 0.2361 | 2.653 | 10.76 | 2425 | 398 | 25.7 |
+| Learned E2E | 29.43 | 0.8765 | 6.77 | 0.2862 | 2.653 | 10.76 | 2259 | 390 | 25.5 |
+| Hybrid teacher FP32 | 34.91 | 0.8945 | 2.44 | 0.2361 | 2.653 | 10.76 | 2728 | 398 | 25.7 |
 | Hybrid teacher FP16 | 34.91 | 0.8945 | 2.44 | 0.2361 | 2.653 | 5.38 | – | – | 14.0 |
 | Hybrid w/o noise map | 34.78 | 0.8933 | 2.45 | 0.2444 | 2.652 | – | – | – | – |
 | Student (no distillation) | 34.52 | 0.8911 | 2.59 | 0.2460 | 0.630 | – | – | – | 3.6 |
-| Hybrid student FP32 (KD) | 34.56 | 0.8911 | 2.56 | 0.2504 | 0.630 | 2.53 | 546 | 170 | 3.6 |
-| Hybrid student INT8 (KD) | 34.54 | 0.8903 | 2.57 | 0.2489 | 0.630 | 0.71 | 784 | 178 | – |
-| Student full 8-bit W8A8 (KD) | 27.72 | 0.5844 | 7.90 | 0.3980 | 0.630 | 0.71 | 305 | 163 | – |
+| Hybrid student FP32 (KD) | 34.56 | 0.8911 | 2.56 | 0.2504 | 0.630 | 2.53 | 365 | 171 | 3.6 |
+| Hybrid student INT8 (KD) | 34.54 | 0.8903 | 2.57 | 0.2489 | 0.630 | 0.71 | 527 | 173 | – |
+| Student full 8-bit W8A8 (KD) | 27.72 | 0.5844 | 7.90 | 0.3980 | 0.630 | 0.71 | 216 | 164 | – |
 
 Traditional ISP CPU time: 92 ms per 512×512 crop (whole pipeline, numpy/OpenCV). Network latencies are for the network stage only; the classical stages add the same cost to every hybrid variant.
 

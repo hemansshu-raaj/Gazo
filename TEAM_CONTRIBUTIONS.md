@@ -133,7 +133,7 @@ gain), and the burst ground truth contains an object that moved, so part of the 
 **Numbers to quote**
 - Teacher 10.8 MB → deployed student 0.71 MB (15× smaller) for −0.37 dB.
 - FP16 on GPU: 25.7 → 14.0 ms per MP, no quality loss.
-- Student FP32: 546 ms per MP on 2 CPU threads, 170 MB peak memory.
+- Student network: 365 ms per MP (FP32) / 527 ms (W8A16) on 2 CPU threads, about 170 MB peak memory. Whole deployed pipeline: 0.64 s per MP.
 
 **Likely viva questions**
 1. *Why did 8-bit activations fail?* Linear RAW is dark: shadows use ~1% of the range. One 8-bit scale per

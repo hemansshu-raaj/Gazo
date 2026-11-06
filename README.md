@@ -11,12 +11,12 @@ conditioned on a per-pixel noise map. We compare it with a **traditional ISP** a
 
 ## Results (test split: 26 captures of 2 scenes never seen in training, 832 crops)
 
-| Pipeline | PSNR ↑ | SSIM ↑ | ΔE2000 ↓ | LPIPS ↓ | Params | Size | CPU ms / MP (2 threads) |
+| Pipeline | PSNR ↑ | SSIM ↑ | ΔE2000 ↓ | LPIPS ↓ | Params | Size | Full pipeline, CPU ms / MP (2 threads) |
 |---|---|---|---|---|---|---|---|
-| Traditional ISP | 28.03 | 0.674 | 5.83 | 0.459 | – | – | – |
-| Learned end-to-end | 29.43 | 0.877 | 6.77 | 0.286 | 2.65 M | 10.8 MB | 2418 |
-| **Hybrid teacher** | **34.91** | **0.895** | **2.44** | **0.236** | 2.65 M | 10.8 MB | 2425 |
-| Hybrid student, INT8 weights / 16-bit activations (**deployed**) | 34.54 | 0.890 | 2.57 | 0.249 | 0.63 M | **0.71 MB** | 784 |
+| Traditional ISP | 28.03 | 0.674 | 5.83 | 0.459 | – | – | 305 |
+| Learned end-to-end | 29.43 | 0.877 | 6.77 | 0.286 | 2.65 M | 10.8 MB | 2697 |
+| **Hybrid teacher** | **34.91** | **0.895** | **2.44** | **0.236** | 2.65 M | 10.8 MB | 2753 |
+| Hybrid student, INT8 weights / 16-bit activations (**deployed**) | 34.54 | 0.890 | 2.57 | 0.249 | 0.63 M | **0.71 MB** | 637 |
 
 - Hybrid vs traditional: **+6.9 dB, ΔE 5.83 → 2.44.** Hybrid vs the same network trained end-to-end: **+5.5 dB.**
 - Deployed model: **15× smaller** than the teacher, −0.37 dB.
