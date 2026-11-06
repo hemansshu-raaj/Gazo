@@ -1,0 +1,1 @@
+Reference copy of https://github.com/AbdoKamel/simple-camera-pipeline (MIT). Our stages in isp/classical are re-implemented from it; tone curve data in isp/classical/tone_curve_data.py comes from its tone_curve.mat.

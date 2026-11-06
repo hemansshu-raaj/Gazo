@@ -1,0 +1,42 @@
+[
+ {
+  "model": "teacher_fp32.onnx",
+  "size_mb": 10.764232,
+  "params": 2653004,
+  "cpu2_1024px_ms": 2425.0,
+  "peak_mem_mb_1024px": 398.0,
+  "cpu4_1024px_ms": 1764.5
+ },
+ {
+  "model": "e2e_fp32.onnx",
+  "size_mb": 10.760566,
+  "params": 2652716,
+  "cpu2_1024px_ms": 2417.5,
+  "peak_mem_mb_1024px": 390.2,
+  "cpu4_1024px_ms": 1745.4
+ },
+ {
+  "model": "student_fp32.onnx",
+  "size_mb": 2.533697,
+  "params": 629756,
+  "cpu2_1024px_ms": 546.3,
+  "peak_mem_mb_1024px": 170.2,
+  "cpu4_1024px_ms": 361.4
+ },
+ {
+  "model": "student_int8.onnx",
+  "size_mb": 0.714154,
+  "params": 632536,
+  "cpu2_1024px_ms": 783.6,
+  "peak_mem_mb_1024px": 177.6,
+  "cpu4_1024px_ms": 559.3
+ },
+ {
+  "model": "student_kd_w8a8.onnx",
+  "size_mb": 0.709917,
+  "params": 632536,
+  "cpu2_1024px_ms": 305.2,
+  "peak_mem_mb_1024px": 163.4,
+  "cpu4_1024px_ms": 243.4
+ }
+]

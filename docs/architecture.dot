@@ -1,0 +1,41 @@
+// Render: dot -Tpng -Gdpi=150 docs/architecture.dot -o docs/architecture.png
+digraph ISP {
+  rankdir=LR; newrank=true; fontname="Helvetica"; nodesep=0.25; ranksep=0.35;
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=10, fillcolor="#eef2f7", color="#5b6b82"];
+  edge [color="#5b6b82", arrowsize=0.7];
+
+  subgraph cluster_data { label="Data + training (Modal)"; style="rounded,dashed"; color="#999999"; fontsize=11;
+    hf   [label="SIDD DNG bursts\n115 scenes x 150 frames\n(HF: SIDD-CC-DNG)", fillcolor="#f7f7f7"];
+    prep [label="modal_app/prepare_data.py\nGT RAW = 150-frame mean\n+ 4 noisy frames + DNG tags"];
+    gt   [label="modal_app/render_gt.py\nGT sRGB = reference renderer\nscene-wise split (isp/data.py)"];
+    trn  [label="modal_app/train.py\nisp/train_loop.py\nteacher | e2e | nosigma\nstudent_kd | student_scratch"];
+    opt  [label="optimize/\nexport_onnx -> quantize (INT8)\nbenchmark"];
+    hf -> prep -> gt -> trn -> opt;
+  }
+
+  in   [label="RAW input\nDNG / SIDD npz / 16-bit PNG\nisp/io.py", fillcolor="#fff4d6"];
+  norm [label="CLASSICAL FRONT\nblack/white level, CFA->RGGB\nisp/classical/bayer.py", fillcolor="#e3f0e3"];
+  wb   [label="White balance\nAsShotNeutral | gray-world/edge\nisp/classical/wb.py", fillcolor="#e3f0e3"];
+  nz   [label="Noise model sigma(x)=sqrt(ax+b)\nNoiseProfile | estimated\nisp/noise.py", fillcolor="#e3f0e3"];
+  ae   [label="Exposure analysis\n(optional adaptive gain)\nisp/classical/tone.py", fillcolor="#e3f0e3"];
+
+  subgraph cluster_h { label="HYBRID  isp/pipelines/hybrid.py"; style="rounded"; color="#2f6db5"; fontsize=11;
+    net  [label="LEARNED: joint denoise + demosaic\npacked RGGB + sigma map\nNAF-UNet teacher / conv-UNet student\nisp/models, isp/engine.py (tiled)", fillcolor="#dbe8fb"];
+    ccm  [label="CCM (dual-illuminant\ninterpolated DNG matrix)\nisp/classical/ccm.py", fillcolor="#e3f0e3"];
+    tn   [label="sRGB gamma + tone curve\nisp/classical/tone.py", fillcolor="#e3f0e3"];
+    sh   [label="Noise-adaptive sharpening\nisp/classical/sharpen.py", fillcolor="#e3f0e3"];
+    net -> ccm -> tn -> sh;
+  }
+  subgraph cluster_t { label="TRADITIONAL  isp/pipelines/traditional.py"; style="rounded"; color="#888888"; fontsize=11;
+    t1 [label="Malvar demosaic -> CCM -> gamma/tone\n-> bilateral/NLM denoise -> sharpen"];
+  }
+  subgraph cluster_e { label="LEARNED E2E  isp/pipelines/learned.py"; style="rounded"; color="#888888"; fontsize=11;
+    e1 [label="packed RAW (no metadata)\n-> NAF-UNet -> sRGB"];
+  }
+  out  [label="sRGB output\n+ stage gallery, metrics\napp.py (Gradio on Modal)", fillcolor="#fff4d6"];
+
+  in -> norm -> wb -> ae -> nz -> net;
+  ae -> t1; norm -> e1;
+  sh -> out; t1 -> out; e1 -> out;
+  opt -> net [style=dashed, label="ONNX weights", fontsize=9];
+}

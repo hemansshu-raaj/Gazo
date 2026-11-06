@@ -1,0 +1,11 @@
+# Runtime-only dependencies for the web app (no PyTorch: models run with ONNX Runtime)
+numpy<2.3
+scipy
+opencv-python-headless
+rawpy
+exifread
+scikit-image
+colour-demosaicing
+onnxruntime
+gradio>=5
+matplotlib  # gradio needs it at runtime (crashes without it)
