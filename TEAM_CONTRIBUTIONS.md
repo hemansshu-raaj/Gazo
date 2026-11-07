@@ -80,17 +80,6 @@ colour, costing about 6 dB in our ablation.
 - Noise map: wrong σ at inference costs 1.1–1.6 dB; a model retrained without it is 0.13 dB worse.
 - Distillation: +0.04 dB (negligible). Student is only 0.37 dB behind the teacher.
 
-**Likely viva questions**
-1. *Why NAFNet blocks?* They're state of the art on SIDD denoising and use no expensive attention: depthwise
-   convolutions, a simple gate and cheap channel attention.
-2. *Why put the loss in sRGB through the classical tail?* Errors in dark linear values become large after gamma.
-   Training through the tail optimises what the viewer actually sees.
-3. *Why feed a noise map?* It tells the network how strongly to denoise each pixel (FFDNet idea), so one model
-   covers ISO 100 to 10,000, and it can be steered at inference.
-4. *Why did distillation not help?* The small student already reaches 99% of the teacher, so there's little left
-   to transfer in 30k steps. We report it as a negative result.
-5. *How do you avoid overfitting with 76 training captures?* Thousands of random crops per capture, 4 noisy
-   frames each, flips, noise augmentation, and model selection on a held-out scene.
 
 **Failure case I present:** F1. At ISO 10,000, deep shadows get a red/yellow cast (black-level error amplified by
 gain), and the burst ground truth contains an object that moved, so part of the error is in the GT.
