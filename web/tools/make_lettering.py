@@ -48,8 +48,8 @@ def main():
     w = x1 - x0
     by = y1 + 0.10 * upm
     sx = lambda f: f"{x0 + f * w:.0f}"
-    swash = (f"M{sx(0.10)},{by + 10:.0f} C{sx(0.30)},{by + 60:.0f} {sx(0.50)},{by - 10:.0f} {sx(0.66)},{by - 70:.0f} "
-             f"L{sx(0.50)},{by + 40:.0f} L{sx(0.66)},{by + 15:.0f} L{sx(0.56)},{by + 110:.0f}")
+    swash = (f"M{sx(0.06)},{by + 10:.0f} C{sx(0.35)},{by + 70:.0f} {sx(0.70)},{by - 10:.0f} {sx(0.98)},{by - 70:.0f} "
+             f"L{sx(0.80)},{by + 40:.0f} L{sx(0.97)},{by + 15:.0f} L{sx(0.87)},{by + 110:.0f}")
     vb = (x0 - PAD, y0 - PAD, w + 2 * PAD, (by + 150) - (y0 - PAD))
 
     parts = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{vb[0]:.0f} {vb[1]:.0f} {vb[2]:.0f} {vb[3]:.0f}" '
