@@ -32,7 +32,7 @@ digraph ISP {
   subgraph cluster_e { label="LEARNED E2E  isp/pipelines/learned.py"; style="rounded"; color="#888888"; fontsize=11;
     e1 [label="packed RAW (no metadata)\n-> NAF-UNet -> sRGB"];
   }
-  out  [label="sRGB output\n+ stage gallery, metrics\napp.py (Gradio on Modal)", fillcolor="#fff4d6"];
+  out  [label="sRGB output\n+ stage gallery, metrics\nweb/ (Take a Pic website on Modal)", fillcolor="#fff4d6"];
 
   in -> norm -> wb -> ae -> nz -> net;
   ae -> t1; norm -> e1;

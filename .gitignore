@@ -10,5 +10,17 @@ runs/
 .env
 *.token
 flagged/
-.gradio/
 reference/
+# Playwright CLI output (may contain credentials)
+.playwright-cli/
+# local tools, notes and generated previews
+.claude/
+skills-lock.json
+report/
+images_web/
+ideas/
+new_web_images_idea/
+web/blender/*.png
+*.pdf
+Color Hunt Palette*.png
+Hackathon Solution Report Template.md

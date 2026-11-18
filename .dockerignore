@@ -4,3 +4,7 @@ runs
 reference
 .git
 **/__pycache__
+web/blender/*.png
+web/tests
+report
+.claude

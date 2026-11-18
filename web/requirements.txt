@@ -1,0 +1,11 @@
+# Website backend = the ISP runtime (../requirements-app.txt, minus gradio) + FastAPI
+numpy<2.3
+scipy
+opencv-python-headless
+rawpy
+exifread
+scikit-image
+colour-demosaicing
+onnxruntime
+fastapi[standard]
+python-multipart

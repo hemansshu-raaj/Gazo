@@ -1,0 +1,132 @@
+{
+  "_how_to_edit": "Titles and explanations for every stage on the method pages. 'points' is a bullet list (one string per bullet); an optional 'text' adds paragraphs above it (blank line between paragraphs). The keys must match the stage ids in web/api/trace.py. 'order' lists which stages each method page shows, top to bottom; a stage listed there is shown only when that run produced it (e.g. sharpening when it is switched on).",
+
+  "methods": {
+    "classic": {
+      "title": "Classic ISP",
+      "subtitle": "Every step is a hand-written algorithm.",
+      "order": ["photosites", "bayer", "white_balance", "demosaic", "color_correction", "gamma_tone", "denoise", "sharpen"]
+    },
+    "learned": {
+      "title": "Learned ISP",
+      "subtitle": "One neural network does everything after the sensor.",
+      "order": ["photosites", "bayer", "pack", "network_e2e"]
+    },
+    "hybrid": {
+      "title": "Hybrid ISP",
+      "subtitle": "Classical steps where physics is known, a small network where it is not.",
+      "order": ["photosites", "bayer", "white_balance", "noise_map", "network_hybrid", "color_correction", "gamma_tone", "sharpen"]
+    }
+  },
+
+  "stages": {
+    "photosites": {
+      "title": "Light on the photosites",
+      "points": [
+        "The sensor is a grid of millions of tiny light buckets called photosites.",
+        "During the exposure each photosite counts the light (photons) that falls on it.",
+        "It measures only how much light, not its colour, so the raw sensor sees a grey picture.",
+        "Each count becomes a 10 to 14-bit number. These numbers are what a RAW (.dng) file stores.",
+        "Dark areas collect few photons, so they are the noisiest part of the image."
+      ]
+    },
+    "bayer": {
+      "title": "Bayer colour filter",
+      "points": [
+        "A tiny colour filter sits on every photosite: red, green or blue, in a repeating 2×2 RGGB pattern.",
+        "So each pixel records only one of the three colours. The other two are missing.",
+        "Green appears twice in every block because our eyes are most sensitive to green detail.",
+        "That is why the raw image looks green and checkered in the close-up."
+      ]
+    },
+    "white_balance": {
+      "title": "White balance",
+      "points": [
+        "Different light tints a scene: bulbs look orange, shade looks blue.",
+        "White balance multiplies the red, green and blue values by separate gains so white objects look white again.",
+        "The gains come from the camera's own measurement stored in the DNG (AsShotNeutral). Gray-world is the fallback when it is missing.",
+        "Using the camera's metadata instead of guessing gave +5.8 dB in our tests.",
+        "With auto exposure on, a dark photo is also brightened here by a digital gain."
+      ]
+    },
+    "demosaic": {
+      "title": "Demosaicing",
+      "points": [
+        "Fills in the two missing colours at every pixel from its neighbouring photosites.",
+        "We use Malvar-He-Cutler: simple interpolation, corrected using the edges seen in the other colours.",
+        "Done badly, this step causes zipper edges and false colour fringes on fine patterns.",
+        "Afterwards every pixel has red, green and blue, but still in the camera's own colours."
+      ]
+    },
+    "color_correction": {
+      "title": "Colour correction (CCM)",
+      "points": [
+        "Every sensor's colour filters see colour a little differently from the human eye.",
+        "A 3×3 colour correction matrix, built from the colour matrices in the DNG, converts camera colours to standard sRGB.",
+        "This is what makes colours look natural and consistent between phones.",
+        "Removing this step cost 2.2 dB in our tests."
+      ]
+    },
+    "gamma_tone": {
+      "title": "Gamma and tone curve",
+      "points": [
+        "Sensor values are linear, but our eyes notice changes in dark tones far more than in bright ones.",
+        "The sRGB gamma curve brightens the shadows so the picture looks right on a screen.",
+        "A gentle S-shaped tone curve then adds contrast, like a phone camera's photo look.",
+        "This is the first stage where the image looks like a normal photo."
+      ]
+    },
+    "denoise": {
+      "title": "Denoising",
+      "points": [
+        "Removes the grain the sensor adds, worst in dark and high-ISO photos.",
+        "Uses an edge-preserving bilateral filter: it averages only nearby pixels with similar colours, so edges stay sharp.",
+        "Its strength follows the noise level measured in this image.",
+        "Too much smears fine texture, too little leaves grain. A hand-tuned filter has to pick one."
+      ]
+    },
+    "sharpen": {
+      "title": "Sharpening",
+      "points": [
+        "Brings back crispness lost during demosaicing and denoising.",
+        "Unsharp masking: the difference between the image and a blurred copy is added back, on brightness only.",
+        "The amount is reduced when the image is noisy, so the grain is not sharpened too."
+      ]
+    },
+    "pack": {
+      "title": "Packing the four colour planes",
+      "points": [
+        "The RAW mosaic is split into four half-size planes: R, G, G and B.",
+        "Each plane holds photosites of one colour, which is an easy shape for a neural network to read.",
+        "Nothing else is given to this model: no white balance, colour matrix or noise level from the file."
+      ]
+    },
+    "network_e2e": {
+      "title": "End-to-end network",
+      "points": [
+        "A single neural network (a NAF-UNet with 2.65 million parameters) does every remaining step at once.",
+        "It learned white balance, demosaicing, denoising, colour and tone from pairs of noisy RAW photos and clean reference photos (SIDD).",
+        "It must guess the colour of the light and the camera's colours from the pixels alone.",
+        "That guessing is why its colour error (ΔE) is higher than the hybrid's."
+      ]
+    },
+    "noise_map": {
+      "title": "Noise map",
+      "points": [
+        "Predicts how noisy every pixel is, using the camera's noise model (the DNG's NoiseProfile, or an estimate when it is missing).",
+        "Brighter pixels have more photon noise, and a higher ISO adds more on top.",
+        "This map goes into the network as a fifth input, telling it where to clean harder.",
+        "Brighter colours in the heat map mean noisier pixels."
+      ]
+    },
+    "network_hybrid": {
+      "title": "Network: joint denoise + demosaic",
+      "points": [
+        "A small network does only the hard part: removing noise and filling in the missing colours together.",
+        "Input: the white-balanced four colour planes plus the noise map. Output: clean, full-colour linear RGB.",
+        "Doing both at once avoids the errors of doing them one after the other.",
+        "The default model is 0.7 MB (8-bit weights), trained to copy a larger teacher model. Switch to the teacher in Advanced."
+      ]
+    }
+  }
+}

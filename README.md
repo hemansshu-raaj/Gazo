@@ -1,6 +1,9 @@
 # Hybrid Smartphone ISP: RAW → sRGB (CV Hackathon 2026, Problem P2)
 
-**Live app:** https://hemansshu-raaj--hybrid-isp.us-east.modal.run
+**Live website ("Take a Pic"):** https://hemansshu-raaj--take-a-pic.us-east.modal.run
+
+Drop a RAW photo on a 3D phone, pick the Classic, Learned or Hybrid ISP, and scroll through every stage of it on
+your own photo, then compare all three on our examples. Code: [`web/`](web/README.md).
 
 A smartphone image signal processor that turns noisy Bayer RAW into a finished sRGB photo. Classical camera stages do
 the jobs they are good at and that depend on camera metadata: black level, white balance, noise model, colour matrix
@@ -32,12 +35,15 @@ Design: [`docs/design_doc.md`](docs/design_doc.md).
 ```bash
 make setup        # Python 3.12 venv (uv) + all dependencies
 make test         # unit tests
-make app          # web app on http://localhost:7860 (uses weights/*.onnx)
-make docker       # same app in Docker:  docker build -t hybrid-isp . && docker run -p 7860:7860 hybrid-isp
+make web          # the website on http://localhost:8000 (uses weights/*.onnx)
+make web-test     # website backend tests;  make web-e2e: whole-site browser test (needs playwright-cli)
+make docker       # the website in Docker:  docker build -t take-a-pic . && docker run -p 8000:8000 take-a-pic
+make deploy       # host it on Modal (CPU, scales to zero)
 ```
 
-The app accepts phone **DNG** files (Android Pro/RAW mode; Pixel, OnePlus, Xiaomi, Samsung and others), our SIDD
-`.npz` crops (which include ground truth, so the app shows metrics), and 16-bit Bayer PNGs.
+The website accepts phone **DNG** files (Android Pro/RAW mode; Pixel, OnePlus, Xiaomi, Samsung and others), our SIDD
+`.npz` crops (which include ground truth, so it shows metrics), and 16-bit Bayer PNGs. Ordinary JPG/HEIC photos are
+refused with an explanation, because they have already been through a phone's ISP.
 
 ## Reproducing the results
 
@@ -62,9 +68,10 @@ make eval         # full test-split evaluation -> eval_P2_T77.md
 | `isp/pipelines/` | `traditional.py`, `learned.py`, `hybrid.py`: the three ISPs compared |
 | `isp/engine.py` | tiled inference with PyTorch or ONNX Runtime |
 | `isp/train_loop.py`, `isp/train_data.py` | training (Charbonnier loss in sRGB through the classical tail, distillation) |
-| `modal_app/` | dataset build, GT rendering, training, hosting on Modal |
+| `modal_app/` | dataset build, GT rendering, training and evaluation on Modal |
+| `web/` | the "Take a Pic" website: FastAPI backend (`web/api`), static site (`web/site`), 3D phone (`web/blender`), Modal hosting (`web/deploy_modal.py`) |
 | `optimize/` | ONNX export, INT8 quantisation, benchmark |
-| `eval/` | evaluation, ablations, app examples |
+| `eval/` | evaluation, ablations, website examples |
 | `docs/` | architecture diagram, design document, ablation + failure analysis |
 
 ## Data
@@ -79,5 +86,6 @@ No test content is seen in training.
 
 _Expanded in `docs/design_doc.md`._ The ground truth is rendered by a fixed classical renderer, so "quality" means
 fidelity to that rendering, not a phone maker's aesthetic. Training covers 5 (older) phones, and colour on unseen
-sensors relies on DNG metadata. Uploaded images are processed in memory and not stored. Datasets: SIDD (MIT); the
+sensors relies on DNG metadata. Uploaded RAW files are kept only in the server's temporary folder for at most 2 hours (so a method
+page can process them), are never shared, and are deleted automatically. Datasets: SIDD (MIT); the
 tone curve comes from simple-camera-pipeline (MIT), see `third_party/`.

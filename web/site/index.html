@@ -1,0 +1,61 @@
+<!doctype html>
+<!--
+  Front page. Layout and copy are here; behaviour is in js/home.js; the phone in js/phone3d.js;
+  what the phone's screen shows in js/screen-ui.js; styles in css/base.css + css/home.css.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Take a Pic: how a phone camera makes a photo</title>
+  <meta name="description" content="Drop a RAW photo on a 2008 phone and watch three image signal processors (classic, learned and hybrid) turn sensor data into a picture.">
+  <meta property="og:title" content="Take a Pic">
+  <meta property="og:description" content="Watch a phone camera turn raw sensor data into a photo, step by step.">
+  <meta name="theme-color" content="#FFD60A">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800;900&family=Bangers&display=swap">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/home.css">
+  <script type="importmap">
+    { "imports": { "three": "./vendor/three/three.module.min.js", "three/addons/": "./vendor/three/addons/" } }
+  </script>
+</head>
+<body class="home">
+  <a class="skip" href="#examples">Skip to the example photos</a>
+
+  <header class="topbar">
+    <span class="mark">Hybrid ISP <span class="mark-sub">Team T77</span></span>
+    <a class="toplink" href="https://github.com/hemansshu-raaj/Gazo">Code on GitHub</a>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="lettering-title">
+      <h1 class="title" id="title"><span class="sr-only">Take a Pic</span></h1>
+
+      <div class="stage-slot" id="stage-slot">
+        <p class="sfx" id="sfx" aria-hidden="true">SHHK!</p>
+      </div>
+      <div class="stage" id="stage"></div>
+
+      <p class="hint"><span class="hint-box" id="hint-box"><span id="hint">Drag a RAW photo (.dng) onto the screen. Drag the phone to spin it.</span></span></p>
+
+      <!-- hidden file picker: opened by tapping the phone's screen -->
+      <div class="sr-actions" id="sr-actions">
+        <label class="sr-only" for="file">Choose a RAW file</label>
+        <input id="file" type="file" accept=".dng,.DNG,.npz,.nef,.cr2,.cr3,.arw,.orf,.rw2,.raf">
+      </div>
+      <p class="sr-only" id="status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="examples" id="examples" aria-labelledby="examples-title">
+      <h2 id="examples-title"><span class="ex-scribble">No RAW file? Drop one of ours.</span></h2>
+      <ul class="example-list" id="example-list"></ul>
+    </section>
+  </main>
+
+  <div class="iris" id="iris" aria-hidden="true"></div>
+  <script type="module" src="js/home.js"></script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!doctype html>
+<!-- Developer sandbox: the 3D phone alone. Open http://localhost:8000/dev/phone.html -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phone sandbox</title>
+  <script type="importmap">
+    { "imports": { "three": "../vendor/three/three.module.min.js", "three/addons/": "../vendor/three/addons/" } }
+  </script>
+  <style>
+    html, body { margin: 0; height: 100%; background: #FFD60A; }
+    #stage { position: fixed; inset: 0; }
+  </style>
+</head>
+<body>
+  <div id="stage"></div>
+  <script type="module">
+    import { createPhone } from "../js/phone3d.js";
+    const phone = await createPhone(document.querySelector("#stage"), { model: "../assets/models/phone.glb" });
+    // test pattern for the screen, so its orientation is easy to check
+    const c = phone.screenCanvas, g = c.getContext("2d");
+    g.fillStyle = "#0d1b24"; g.fillRect(0, 0, c.width, c.height);
+    g.fillStyle = "#FFD60A"; g.font = "bold 64px sans-serif"; g.textAlign = "center";
+    g.fillText("TOP", c.width / 2, 110);
+    g.font = "bold 44px sans-serif"; g.fillText("screen test", c.width / 2, c.height / 2);
+    g.fillText("bottom", c.width / 2, c.height - 50);
+    phone.refreshScreen();
+    window.phone = phone;
+  </script>
+</body>
+</html>

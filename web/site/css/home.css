@@ -1,0 +1,114 @@
+/* Front page: solid yellow, hand-written title, the phone, the example photos. */
+body.home { background: var(--yellow); min-height: 100vh; overflow-x: hidden; }
+
+.topbar {
+  position: fixed; inset: 0 0 auto 0; z-index: 10;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px var(--gutter);
+}
+.mark { font-weight: 900; letter-spacing: -.01em; }
+.mark-sub { font-weight: 500; opacity: .65; margin-left: 6px; }
+
+.hero {
+  min-height: 100svh;
+  display: grid; grid-template-rows: auto 1fr auto; justify-items: center;
+  padding: 56px var(--gutter) 12px;
+}
+
+/* ---- "Take a Pic", written on letter by letter */
+.title { margin: 0; width: min(620px, 86vw); line-height: 0; position: relative; z-index: 2; }
+.title svg { width: 100%; height: auto; overflow: visible; filter: var(--misprint); }
+.title .letter {
+  fill: transparent; stroke: var(--ink); stroke-width: 16; stroke-linejoin: round; stroke-linecap: round;
+  stroke-dasharray: var(--len); stroke-dashoffset: var(--len);
+  animation: write .55s calc(.25s + var(--i) * .13s) var(--ease) forwards,
+             ink-in .25s calc(.6s + var(--i) * .13s) forwards;
+}
+.title .swash {
+  fill: none; stroke: var(--ink); stroke-width: 22; stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: var(--len); stroke-dashoffset: var(--len);
+  animation: write .5s calc(.4s + var(--i) * .13s) var(--ease) forwards;
+}
+@keyframes write { to { stroke-dashoffset: 0; } }
+@keyframes ink-in { to { fill: var(--ink); } }
+
+/* ---- the 3D phone */
+/* the phone is drawn on a canvas covering the whole window, behind the page; .stage-slot is the box
+   on the page where it appears when not zoomed (js/phone3d.js frames the camera onto it) */
+.stage-slot { position: relative; width: min(760px, 100%); height: 100%; min-height: 380px; margin-top: -2vh; }
+.stage { position: fixed; inset: 0; z-index: 0; }
+.stage canvas { position: absolute; inset: 0; display: block; outline: none; }
+body.home .title, body.home .hint, body.home .sr-actions { position: relative; z-index: 2; }
+/* keyboard focus on the phone: ring around its box on the page (the canvas itself fills the window) */
+.stage canvas:focus-visible { outline: none; }
+body:has(.stage canvas:focus-visible) .stage-slot { outline: 3px dashed var(--ink); outline-offset: -8px; border-radius: 24px; }
+body.zoomed .stage-slot, body.flying .stage-slot { outline: none !important; }
+.stage.dragging canvas { filter: drop-shadow(0 0 0 var(--ink)); }
+
+/* comic sound effect when the slider opens */
+.sfx {
+  position: absolute; left: 62%; top: 20%; margin: 0; pointer-events: none;
+  font: 400 clamp(40px, 6vw, 74px)/1 var(--font-sfx); color: var(--red);
+  -webkit-text-stroke: 3px var(--ink); paint-order: stroke fill;
+  transform: rotate(-12deg) scale(0); opacity: 0;
+}
+.sfx.pop { animation: pop .7s var(--ease) forwards; }
+@keyframes pop {
+  0% { transform: rotate(-12deg) scale(.2); opacity: 1; }
+  25% { transform: rotate(-8deg) scale(1.15); opacity: 1; }
+  70% { transform: rotate(-10deg) scale(1); opacity: 1; }
+  100% { transform: rotate(-10deg) scale(1.05); opacity: 0; }
+}
+
+.hint { margin: 10px 0 6px; text-align: center; }
+.hint-box { font-weight: 700; font-size: 15px; }
+body.home.zoomed .hint { visibility: hidden; }   /* the hint goes once a photo is chosen */
+
+.sr-actions input[type=file] { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.sr-actions input[type=file]:focus-visible + * { outline: none; }
+
+/* ---- example photos */
+.examples { padding: 24px var(--gutter) 40px; max-width: 1180px; margin: 0 auto; }
+.examples h2 { font-size: 20px; font-weight: 900; margin: 0 0 14px; text-align: center; }
+.example-list {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px;
+}
+.example {
+  display: grid; grid-template-columns: 64px 1fr; gap: 12px; align-items: center; width: 100%;
+  padding: 8px 12px 8px 8px; text-align: left; cursor: grab;
+  background: var(--paper); border: 2.5px solid var(--ink); border-radius: var(--radius);
+  box-shadow: 4px 4px 0 var(--ink);
+  transition: transform .15s var(--ease), box-shadow .15s var(--ease);
+}
+.example:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ink); }
+.example:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); cursor: grabbing; }
+.example img { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; border: 2px solid var(--ink); }
+.example strong { display: block; font-size: 14px; line-height: 1.25; }
+.example span { font-size: 12px; opacity: .7; }
+
+@media (max-width: 600px) {
+  .hero { padding-top: 52px; }
+  .stage-slot { min-height: 420px; }
+  .hint { font-size: 14px; }
+  .example-list { grid-template-columns: 1fr; }
+  .mark-sub { display: none; }
+}
+
+/* ---- the transition: a lens iris opens from the camera onto the dark method page */
+.iris {
+  position: fixed; inset: 0; z-index: 100; pointer-events: none;
+  background: var(--night) url("../assets/fx/flare.jpg") center / cover;
+  clip-path: circle(0 at var(--x, 50%) var(--y, 50%));
+}
+.iris.open { clip-path: circle(150vmax at var(--x, 50%) var(--y, 50%)); transition: clip-path .5s cubic-bezier(.7, 0, .3, 1); }
+
+/* ---- leaving for a method page: the 3D view takes over the whole window */
+body.flying .topbar, body.flying .title, body.flying .hint, body.flying .examples {
+  opacity: 0; transition: opacity .35s ease;
+}
+
+
+body.home .examples { position: relative; z-index: 1; }
+/* "No RAW file?" sits on a white marker scribble, like the hint */
+.examples h2 { width: fit-content; margin-left: auto; margin-right: auto; transform: rotate(-1deg); }

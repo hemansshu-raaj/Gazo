@@ -1,0 +1,74 @@
+<!doctype html>
+<!--
+  Method page. classic.html, learned.html and hybrid.html are the same file apart from data-method
+  and the <title>/<meta> lines: change one, change all three. Everything else comes from
+  js/method.js (behaviour), css/method.css (looks) and content/stages.json (titles + explanations).
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Learned ISP: Take a Pic</title>
+  <meta name="description" content="Follow a RAW photo through a learned image signal processor, one stage at a time.">
+  <meta property="og:title" content="Learned ISP: Take a Pic">
+  <meta name="theme-color" content="#07060b">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800;900&family=Bangers&display=swap">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/method.css">
+  <script type="importmap">
+    { "imports": { "three": "./vendor/three/three.module.min.js", "three/addons/": "./vendor/three/addons/" } }
+  </script>
+</head>
+<body class="method" data-method="learned">
+  <a class="skip" href="#stages">Skip to the stages</a>
+  <canvas class="vortex" id="vortex" aria-hidden="true"></canvas>
+
+  <header class="topbar">
+    <a class="mark" href="./">Take a Pic</a>
+    <nav class="method-nav" aria-label="ISP methods">
+      <a href="classic.html" data-nav="classic">Classic</a>
+      <a href="learned.html" data-nav="learned">Learned</a>
+      <a href="hybrid.html" data-nav="hybrid">Hybrid</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="intro" id="intro" aria-labelledby="method-title">
+      <div class="intro-text">
+        <p class="kicker" id="kicker">Image signal processor</p>
+        <h1 id="method-title"></h1>
+        <p class="sub" id="method-sub"></p>
+        <p class="settings-line" id="method-settings"></p>
+      </div>
+      <p class="loading" id="loading" role="status" aria-live="polite">Developing your photo</p>
+      <a class="scroll-cue" href="#stages" id="scroll-cue" hidden>See every stage <span aria-hidden="true">&darr;</span></a>
+    </section>
+
+    <div class="stages" id="stages"></div>
+
+    <section class="result" id="result" aria-labelledby="result-title" hidden>
+      <h2 id="result-title">The finished photo</h2>
+      <figure class="frame result-frame"><img id="result-img" alt=""></figure>
+      <p class="result-meta" id="result-meta"></p>
+    </section>
+
+    <section class="compare" id="compare" aria-labelledby="compare-title">
+      <h2 id="compare-title">All three ISPs, side by side</h2>
+      <p class="compare-sub">On our example photos, where a clean 150-frame average is the ground truth.</p>
+      <div class="compare-picker" id="compare-picker" role="group" aria-label="Example photo"></div>
+      <div class="compare-grid" id="compare-grid" aria-live="polite"></div>
+      <nav class="next-steps" aria-label="More">
+        <a class="pill" href="./">Back to the phone</a>
+        <span id="other-methods"></span>
+      </nav>
+    </section>
+  </main>
+
+  <ol class="rail" id="rail" aria-label="Stages"></ol>
+
+  <script type="module" src="js/method.js"></script>
+</body>
+</html>

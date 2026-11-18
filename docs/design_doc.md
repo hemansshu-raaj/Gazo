@@ -118,8 +118,8 @@ Detailed with images in `docs/ablation_failures.md`: (F1) ISO 10,000 colour cast
   "beautification", which limits bias, but the training set covers only 5 phones and lab/indoor scenes.
 
 ## 12. Deployment
-Gradio app (`app.py`) served from a CPU container on Modal (`modal_app/serve.py`), scaling to zero when idle and
-kept warm during judging. The same app runs locally (`make app`) or in Docker (`make docker`). Models are
+The "Take a Pic" website (`web/`: a FastAPI backend plus a static three.js site) served from a CPU container on Modal
+(`web/deploy_modal.py`), scaling to zero when idle. The same site runs locally (`make web`) or in Docker (`make docker`). Models are
 ONNX Runtime CPU sessions, with no PyTorch in the serving image. Large photos are processed as a centre 4 MP crop by
 default (full resolution is optional) to stay under ~10 s.
 

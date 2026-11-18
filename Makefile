@@ -7,11 +7,11 @@ setup:            ## create the venv and install everything
 test:             ## unit tests
 	$(PY) -m pytest -q tests
 
-app:              ## run the web app locally on :7860
-	$(PY) app.py
+docker:           ## build + run the website container on :8000
+	docker build -t take-a-pic . && docker run --rm -p 8000:8000 take-a-pic
 
-docker:           ## build + run the app container on :7860
-	docker build -t hybrid-isp . && docker run --rm -p 7860:7860 hybrid-isp
+deploy:           ## host the website on Modal (CPU, scales to zero)
+	$(MODAL) deploy web/deploy_modal.py
 
 data:             ## build the SIDD dataset on Modal, then render ground truth + traditional baseline
 	cd modal_app && ../.venv/bin/modal run prepare_data.py
@@ -37,4 +37,15 @@ eval:             ## full evaluation on the test split (Modal GPU) -> eval_P2_T7
 	$(MODAL) run modal_app/evaluate.py
 	$(PY) -m eval.report --team T77 --usns "1RUA24CSE0162,1RUA24CSE0150,1RUA24CSE0187,1RUA24CSE0167"
 
-.PHONY: setup test app docker data train weights benchmark eval
+.PHONY: setup test docker deploy data train weights benchmark eval
+
+web:              ## run the "Take a Pic" website locally on :8000
+	$(PY) -m uvicorn web.api.main:app --reload --port 8000
+
+web-test:         ## tests for the new website backend
+	$(PY) -m pytest -q web/tests
+
+web-e2e:          ## browser test of the whole site (needs `make web` running + playwright-cli)
+	playwright-cli open about:blank >/dev/null && playwright-cli run-code "$$(cat web/tests/e2e_flow.js)"; playwright-cli close >/dev/null
+
+.PHONY: web web-test web-e2e

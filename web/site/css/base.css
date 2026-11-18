@@ -1,0 +1,63 @@
+/* Shared design tokens and basics for every page. Change colours and fonts here. */
+:root {
+  --yellow: #FFD60A;
+  --ink: #111014;
+  --paper: #FFF7D1;
+  --red: #E8332A;
+  --cyan: #19B5E6;
+  --night: #07060b;
+
+  --font: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sfx: "Bangers", "Archivo", sans-serif;
+
+  --gutter: clamp(16px, 4vw, 48px);
+  --radius: 14px;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  /* comic print misregistration, used on lettering and stickers */
+  --misprint: drop-shadow(2px 1px 0 rgba(232, 51, 42, .55)) drop-shadow(-2px -1px 0 rgba(25, 181, 230, .55));
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; font-family: var(--font); color: var(--ink); line-height: 1.5; }
+img { max-width: 100%; display: block; }
+button { font: inherit; }
+
+.sr-only {
+  position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.skip {
+  position: absolute; left: 12px; top: -60px; z-index: 50; padding: 10px 14px;
+  background: var(--ink); color: var(--yellow); border-radius: 8px; font-weight: 700;
+}
+.skip:focus { top: 12px; }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+
+/* links draw their underline on hover */
+a { color: inherit; }
+.toplink {
+  text-decoration: none; font-weight: 700;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 2px no-repeat;
+  transition: background-size .25s var(--ease);
+  padding: 10px 0;
+}
+.toplink:hover, .toplink:focus-visible { background-size: 100% 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0ms !important; transition-duration: .01ms !important; }
+}
+
+/* ---- marker scribble behind text (js/scribble.js) */
+.scribbled { position: relative; isolation: isolate; }
+.scribble-bg {
+  position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; overflow: visible;
+  filter: drop-shadow(var(--scribble-shadow, 4px 4px 0 var(--ink)));
+}
+.scribble-bg path {
+  fill: none; stroke: var(--scribble, #fff); stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: var(--len); stroke-dashoffset: var(--len);
+}
+.scribbled.drawn .scribble-bg path { animation: scribble-in .8s cubic-bezier(.3, .7, .3, 1) forwards; }
+@keyframes scribble-in { to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) { .scribble-bg path { stroke-dashoffset: 0; animation: none !important; } }

@@ -7,7 +7,7 @@
 | **Hemansshu Raaj RK** (1RUA24CSE0162) | Data and evaluation lead | `modal_app/prepare_data.py`, `modal_app/render_gt.py`, `isp/data.py`, `isp/train_data.py`, `isp/metrics.py`, `isp/evaluation.py`, `modal_app/evaluate.py`, `eval/`, `splits/` |
 | **Gurupreeth H** (1RUA24CSE0150) | Classical ISP lead | `isp/io.py`, `isp/classical/*`, `isp/noise.py`, `isp/pipelines/traditional.py`, `tests/` |
 | **Jithesh D** (1RUA24CSE0187) | Deep learning lead | `isp/models/*`, `isp/train_loop.py`, `modal_app/train.py`, `isp/pipelines/hybrid.py`, `isp/pipelines/learned.py` |
-| **Hitesh S** (1RUA24CSE0167) | Optimisation, deployment and docs lead | `optimize/*`, `isp/engine.py`, `app.py`, `modal_app/serve.py`, `Dockerfile`, `Makefile`, `docs/*`, `README.md` |
+| **Hitesh S** (1RUA24CSE0167) | Optimisation, deployment and docs lead | `optimize/*`, `isp/engine.py`, `web/`, `Dockerfile`, `Makefile`, `docs/*`, `README.md` |
 
 Everyone reviewed the final results together and can explain the overall architecture (`docs/architecture.png`).
 
@@ -94,9 +94,9 @@ gain), and the burst ground truth contains an object that moved, so part of the 
   activations): 0.71 MB, −0.02 dB.
 - The benchmark (parameters, size, CPU latency at 2/4 threads, peak memory) and GPU latency for FP32 vs FP16.
 - Tiled inference engine (overlapping 512² tiles with blending) for any image size.
-- The Gradio app: upload a DNG, choose pipeline or compare all, stage-by-stage gallery, metrics when ground truth
-  exists, friendly errors, 4 MP default crop to stay under ~10 s. Hosted on Modal (scales to zero); Docker image
-  and Makefile for one-command runs.
+- The "Take a Pic" website (`web/`): drop a DNG on a 3D phone, pick Classic / Learned / Hybrid (or Advanced
+  settings), then scroll through every stage on your own photo and compare all three ISPs on the examples. FastAPI
+  backend running the same `isp/` code, hosted on Modal (scales to zero); Docker image and Makefile for one-command runs.
 - The architecture diagram (generated from `docs/architecture.dot`, labelled with real module names), README,
   design document.
 
